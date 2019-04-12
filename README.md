@@ -20,7 +20,7 @@ PART 1: BASIC IMAGEBASE HANDLING
 
 6. a function that removes a photo from imageBase.
 
-7. a function that can write the entry time and time difference into a log file in a uniform manner (so the data can be used for poasibly part 3.
+7. a function that can write the entry time and time difference into a log file in a uniform manner (so the data can be used for part 3).
 
 PART 2: VIDEO/PHOTOS HANDLING
 
