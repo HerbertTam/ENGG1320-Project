@@ -1,6 +1,6 @@
 # ENGG1320-Project
 
-The unorganisedFunction.py contains all the codes you guys did on colab. Please read the following and work on the main.py and make sure each part is able to work together.
+The unorganisedFunction.py contains all the codes you guys did on colab. Please read the following and work on main.py and make sure each part is able to work together.
 
 Planned Structure of Code:
 
