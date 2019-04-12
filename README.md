@@ -44,7 +44,7 @@ easiest of the four, need to make folders entrance_images and exit_images, conta
 
 PART 3: DATA ANALYSIS
 
-If all the above things are done, we can work on using the data for actually predicting the time the queue would take. Since we would have a log file containing entry time and time elapsed, we would have to find some way to extrapolate the data, possibly with somw machine learning.
+If all the above things are done, we can work on using the data for actually predicting the time the queue would take. Since we would have a log file containing entry time and time elapsed, we would have to find some way to extrapolate the data, possibly with some machine learning.
   
 EXTRA THINGS THAT MIGHT BE NESSESARY
 
