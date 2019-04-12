@@ -1,6 +1,6 @@
 import face_recognition
 import cv2
-import os
+import sys,os
 import time
 imageBase = list()    #The data structure for handling the images, structure is (image, time)
 
@@ -35,12 +35,11 @@ def findFacesInVideo(nameOfVideo):
             for frame_number_in_batch, face_locations in enumerate(batch_of_face_locations):
                 number_of_faces_in_frame = len(face_locations)
 
-
                 frame_number = frame_count - 128 + frame_number_in_batch
                 print("I found {} face(s) in frame #{}.".format(number_of_faces_in_frame, frame_number))
 
                 count = 1
-                for face_location in face_locations:
+                for face_location in face_locatiopns:
                     # Print the location of each face in this frame
                     top, right, bottom, left = face_location
                     print(" - A face is located at pixel location Top: {}, Left: {}, Bottom: {}, Right: {}".format(top, left, bottom, right))
@@ -50,7 +49,7 @@ def findFacesInVideo(nameOfVideo):
                     name = 'known_people/{}_{}.jpg'.format(round(frame_number/fps),count)
                     cv2.imwrite(name, crop_img)
                     addData(name)        #add name to imageBase
-                    count++
+                    count += 1
 
             # Clear the frames array to start the next batch
             frames = []
@@ -68,28 +67,28 @@ def detectionFace(image, folder):
 def recognitionFace(unknown_picture,known_people):
     for unknown_picture in face_locations: #check the faces in the image one by one
         for known_face in known_people: #check the faces in known_people one by one
-            if face_recognition.compare_faces([face_recognition.face_encodings(known_face)[0]], face_recognition.face_encodings(unknown_picture)[0] == True:
+            if face_recognition.compare_faces([face_recognition.face_encodings(known_face)[0]], face_recognition.face_encodings(unknown_picture)[0]) == True:
                 index = known_face.index('_')
                 return known_face[:index]
     return 0
 
 
-!ls known_people > known.txt
-!ls unknown_pictures > unknown.txt
+os.system(known_people > known.txt)
+os.system(unknown_pictures > unknown.txt)
 ##Identify faces in pictures (Joe)not tested yet!
 #input: path of known_people directory, path of a picture from unknown_pictures directory
 #output: return match(True) / no match(False)
 def identifyFace(path_known_dir, path_unknown_pic):
     unknown_image = face_recognition.load_image_file(path_unknown_pic + "path_unknown_pic") #edited as the pic is inside "unknown_pictures"
   
-ry, path of a picture from unknown_pictures directory
+# ry, path of a picture from unknown_pictures directory
 
 ##output: return match(True) / no match(False)
 def identifyFace(path_known_dir, path_unknown_pic):
   
-  unknown_image = face_recognition.load_image_file(path_unknown_pic + "path_unknown_pic") #edited as the pic is inside "unknown_pictures"
+    unknown_image = face_recognition.load_image_file(path_unknown_pic + "path_unknown_pic") #edited as the pic is inside "unknown_pictures"
   
-  jpgname = open(path_known_dir + "known.txt", "r")    #edited as the txt is inside "known_people"
+    jpgname = open(path_known_dir + "known.txt", "r")    #edited as the txt is inside "known_people"
   
     #compare unknown picture with each picture in known_people directory
     #output list of results
