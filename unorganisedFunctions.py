@@ -79,12 +79,6 @@ os.system(unknown_pictures > unknown.txt)
 #input: path of known_people directory, path of a picture from unknown_pictures directory
 #output: return match(True) / no match(False)
 def identifyFace(path_known_dir, path_unknown_pic):
-    unknown_image = face_recognition.load_image_file(path_unknown_pic + "path_unknown_pic") #edited as the pic is inside "unknown_pictures"
-  
-# ry, path of a picture from unknown_pictures directory
-
-##output: return match(True) / no match(False)
-def identifyFace(path_known_dir, path_unknown_pic):
   
     unknown_image = face_recognition.load_image_file(path_unknown_pic + "path_unknown_pic") #edited as the pic is inside "unknown_pictures"
   
@@ -100,14 +94,11 @@ def identifyFace(path_known_dir, path_unknown_pic):
         unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
 
         results[i] = face_recognition.compare_faces([biden_encoding], unknown_encoding)
-        i += 1
-  
-    #check if True in results[][0] slot when face exists
-    boo = False
-    for result in results: 
-        if result[0] == True:
-            boo = True
-    return boo
+        if results[i][0] == True:
+            return True, name
+        else:
+            i += 1
+    return False
 
 ##Data structure (Aero)
 def addData(image):
