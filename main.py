@@ -18,8 +18,7 @@ def findFacesInVideo(nameOfVideo, known):
         # Bail out when the video file ends
         if not ret:
             break
-        # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
-        frame = frame[:, :, ::-1]
+        frame = convertColours(frames)
         # Save each frame of the video to a list
         frame_count += 1
         frames.append(frame)
@@ -30,9 +29,9 @@ def findFacesInVideo(nameOfVideo, known):
             # Now let's list all the faces we found in all 128 frames
             for frame_number_in_batch, face_locations in enumerate(batch_of_face_locations):
                 number_of_faces_in_frame = len(face_locations)
-                print("in for loop")
                 frame_number = frame_count - 128 + frame_number_in_batch
-                print("I found {} face(s) in frame #{}.".format(number_of_faces_in_frame, frame_number))
+                if (number_of_faces_in_frame != 0):
+                    print("I found {} face(s) in frame #{}.".format(number_of_faces_in_frame, frame_count))
                 count = 1
                 for face_location in face_locations:
                     # Print the location of each face in this frame
@@ -43,13 +42,49 @@ def findFacesInVideo(nameOfVideo, known):
                     else:
                         name = 'unknown_pictures/{}_{}.jpg'.format(frame_number/fps,count)
                     #cropping the face and saving it in known_people
-                    cv2.imwrite(name, cropImage(frames[frame_number_in_batch],top, left, bottom, right))
+                    cv2.imwrite(name, convertColours(cropImage(frames[frame_number_in_batch],top, left, bottom, right)))
             # Clear the frames array to start the next batch
             frames = []
+
+## Video Stuff
+#find faces in a video and saves all the faces it find in known_people (tested and works)
+def findFacesInVideoNoGPU(nameOfVideo, known):
+    video_capture = cv2.VideoCapture(nameOfVideo)
+    frames = []
+    frame_count = 0
+    fps = video_capture.get(cv2.CAP_PROP_FPS)
+    while video_capture.isOpened():
+        # Grab a single frame of video
+        ret, frame = video_capture.read()
+        # Bail out when the video file ends
+        if not ret:
+            break
+        # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
+        frame = frame[:, :, ::-1]
+        frame_count += 1
+        face_locations = face_recognition.face_locations(frame)
+        number_of_faces_in_frame = len(face_locations)
+        if (number_of_faces_in_frame != 0):
+            print("I found {} face(s) in frame #{}.".format(number_of_faces_in_frame, frame_count))
+        count = 1
+        for face_location in face_locations:
+            # Print the location of each face in this frame
+            top, right, bottom, left = face_location
+            print(" - A face is located at pixel location Top: {}, Left: {}, Bottom: {}, Right: {}".format(top, left, bottom, right))
+            if known:
+                name = 'known_people/{}_{}.jpg'.format(frame_count/fps,count)
+            else:
+                name = 'unknown_pictures/{}_{}.jpg'.format(frame_count/fps,count)
+            #cropping the face and saving it in known_people
+            cv2.imwrite(name, cropImage(frame,top, left, bottom, right))
 
 # crops an image (tested and works)
 def cropImage(image, top, left, bottom, right):
     return image[top:bottom,left:right]
+
+# Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses) (and back)
+def convertColours(image):
+    return image[:, :, ::-1]
 
 # removes images which cannot be encoded (tested and works)
 def removeNotEncodable(directory):
@@ -113,8 +148,8 @@ def findMatchingFaces(known_people,unknown_pictures):
 
 # main function (tested and works!)
 def main():
-    entrance_video = "in1.mp4"
-    exit_video = "out1.mp4"
+    entrance_video = "test1.mp4"
+    exit_video = "test2.mp4"
     findFacesInVideo(entrance_video, True)
     findFacesInVideo(exit_video, False)
     removeNotEncodable("known_people")
@@ -124,5 +159,3 @@ def main():
     findMatchingFaces('known_people','unknown_pictures')
     f = open("data.txt", "r")
     print(f.read())
-
-main()
