@@ -19,7 +19,7 @@ def findFacesInVideo(nameOfVideo, known):
         if not ret:
             break
         # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
-        frame = frame[:, :, ::-1]
+        frame = convertColours(frame)
         # Save each frame of the video to a list
         frame_count += 1
         frames.append(frame)
@@ -42,8 +42,9 @@ def findFacesInVideo(nameOfVideo, known):
                         name = 'known_people/{}_{}.jpg'.format(frame_number/fps,count)
                     else:
                         name = 'unknown_pictures/{}_{}.jpg'.format(frame_number/fps,count)
-                    #cropping the face and saving it in known_people
-                    cv2.imwrite(name, cropImage(frames[frame_number_in_batch],top, left, bottom, right))
+                    #cropping the face and saving it in known_people or unknown_pictures
+                    cv2.imwrite(name, convertColours(cropImage(frames[frame_number_in_batch],top, left, bottom, right)))
+                    count += 1
             # Clear the frames array to start the next batch
             frames = []
 
@@ -61,7 +62,7 @@ def findFacesInVideoNoGPU(nameOfVideo, known):
         if not ret:
             break
         # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
-        frame = frame[:, :, ::-1]
+        frame = convertColours(frame)
         frame_count += 1
         face_locations = face_recognition.face_locations(frame, number_of_times_to_upsample=2)
         number_of_faces_in_frame = len(face_locations)
@@ -75,8 +76,13 @@ def findFacesInVideoNoGPU(nameOfVideo, known):
                 name = 'known_people/{}_{}.jpg'.format(frame_count/fps,count)
             else:
                 name = 'unknown_pictures/{}_{}.jpg'.format(frame_count/fps,count)
-            #cropping the face and saving it in known_people
-            cv2.imwrite(name, cropImage(frame,top, left, bottom, right))          
+            #cropping the face and saving it in known_people or unknown_pictures
+            cv2.imwrite(name, cropImage(convertColours(frame),top, left, bottom, right))
+            count += 1
+
+
+def convertColours(image):
+    return image[:, :, ::-1]
 
 # crops an image (tested and works)
 def cropImage(image, top, left, bottom, right):
@@ -145,10 +151,10 @@ def findMatchingFaces(known_people,unknown_pictures):
 
 # main function (tested and works!)
 def main():
-    entrance_video = "in1.mp4"
-    exit_video = "in1.mp4"
-    findFacesInVideo(entrance_video, True)
-    findFacesInVideo(exit_video, False)
+    entrance_video = "test3.mp4"
+    exit_video = "test3.mp4"
+    findFacesInVideoNoGPU(entrance_video, True)
+    findFacesInVideoNoGPU(exit_video, False)
     removeNotEncodable("known_people")
     removeNotEncodable("unknown_pictures")
     removeDuplicates("known_people")
