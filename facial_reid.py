@@ -76,7 +76,7 @@ def findFacesInVideo(nameOfVideo, known, knownPeople):
             print("number of known people =",len(knownPeople))
         if not known:
             if len(knownPeople) == 0:
-                print("there are no more known people to be recognized.")
+                print("there are no more known people to be reidentified.")
                 break
     if not known:
         print("data appended to data.csv!")
