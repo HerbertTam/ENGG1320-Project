@@ -31,14 +31,14 @@ def findFacesInVideo(nameOfVideo, known, knownPeople):
             top, right, bottom, left = face_location
             time = frame_count/fps
             croppedImage = cropImage(convertColours(frame),top, left, bottom, right)
+            cv2.imwrite('croppedImage.jpg', croppedImage)
             print("found a face at pixel location Top: {}, Left: {}, Bottom: {}, Right: {} at time {}".format(top, left, bottom, right, round(time,2)))
             if known:
-                cv2.imwrite('croppedImage.jpg', croppedImage)
                 try:
                     image = face_recognition.load_image_file('croppedImage.jpg')
                     encoding = face_recognition.face_encodings(image, num_jitters=100)[0]
                 except:
-                    print("image not encodable")
+                    print("image not encodable (probably not a face)")
                     continue
                 print("image encodable! ", end='')
                 for knownPerson in knownPeople:
@@ -57,7 +57,7 @@ def findFacesInVideo(nameOfVideo, known, knownPeople):
                     image = face_recognition.load_image_file('croppedImage.jpg')
                     encoding = face_recognition.face_encodings(image, num_jitters=100)[0]
                 except:
-                    print("image not encodable")
+                    print("image not encodable (probably not a face)")
                     continue
                 print("image encodable! ", end='')
                 for knownPerson in knownPeople:
@@ -83,6 +83,7 @@ def findFacesInVideo(nameOfVideo, known, knownPeople):
     file.close()
     return knownPeople
 
+# convert colours to allow opencv/face_recognition to process the image
 def convertColours(image):
     return image[:, :, ::-1]
 
