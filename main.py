@@ -75,10 +75,11 @@ def findFacesInVideo(nameOfVideo, known, knownPeople):
                 else:
                     print("person not known! ", end='')
             count += 1
+            os.remove("croppedImage.jpg") # removes croppedImage.jpg after usage
             print("number of known people =",len(knownPeople))
-            if len(knownPeople) == 0:
-                print("no more known people to be recognized.")
-                break
+        if len(knownPeople) == 0:
+            print("no more known people to be recognized.")
+            break
     if not known:
         print("data appended to data.csv!")
     file.close()
