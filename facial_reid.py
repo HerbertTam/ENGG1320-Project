@@ -29,10 +29,10 @@ def findFacesInVideo(nameOfVideo, known, knownPeople):
         for face_location in face_locations:
             # Print the location of each face in this frame
             top, right, bottom, left = face_location
-            print("found a face at pixel location Top: {}, Left: {}, Bottom: {}, Right: {}".format(top, left, bottom, right))
+            time = frame_count/fps
+            croppedImage = cropImage(convertColours(frame),top, left, bottom, right)
+            print("found a face at pixel location Top: {}, Left: {}, Bottom: {}, Right: {} at time {}".format(top, left, bottom, right, round(time,2)))
             if known:
-                time = frame_count/fps
-                croppedImage = cropImage(convertColours(frame),top, left, bottom, right)
                 cv2.imwrite('croppedImage.jpg', croppedImage)
                 try:
                     image = face_recognition.load_image_file('croppedImage.jpg')
@@ -53,9 +53,6 @@ def findFacesInVideo(nameOfVideo, known, knownPeople):
                     print("person not known!\nadding person to known people. ", end='')
                     knownPeople.append([[encoding],time]) # adds the first encoding in an array and time of first encoding to knownPeople
             else:
-                time = frame_count/fps
-                croppedImage = cropImage(convertColours(frame),top, left, bottom, right)
-                cv2.imwrite('croppedImage.jpg', croppedImage)
                 try:
                     image = face_recognition.load_image_file('croppedImage.jpg')
                     encoding = face_recognition.face_encodings(image, num_jitters=100)[0]
@@ -65,7 +62,7 @@ def findFacesInVideo(nameOfVideo, known, knownPeople):
                 print("image encodable! ", end='')
                 for knownPerson in knownPeople:
                     if compareEncodings(knownPerson[0],encoding)[0]:
-                        print("person known! updating data.txt and remove person from known people. ", end='')
+                        print("person known! updating data.txt and removing person from known people. ", end='')
                         # append the the time of first encoding and difference in time between the time of first encoding and time of reidentification 
                         # in the exit video into data.txt
                         file.write(str(knownPerson[1]) + "," + str(time-knownPerson[1]))
@@ -79,7 +76,7 @@ def findFacesInVideo(nameOfVideo, known, knownPeople):
             print("number of known people =",len(knownPeople))
         if not known:
             if len(knownPeople) == 0:
-                print("no more known people to be recognized.")
+                print("there are no more known people to be recognized.")
                 break
     if not known:
         print("data appended to data.csv!")
