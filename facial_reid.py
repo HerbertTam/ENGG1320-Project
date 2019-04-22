@@ -77,9 +77,10 @@ def findFacesInVideo(nameOfVideo, known, knownPeople):
             count += 1
             os.remove("croppedImage.jpg") # removes croppedImage.jpg after usage
             print("number of known people =",len(knownPeople))
-        if len(knownPeople) == 0:
-            print("no more known people to be recognized.")
-            break
+        if not known:
+            if len(knownPeople) == 0:
+                print("no more known people to be recognized.")
+                break
     if not known:
         print("data appended to data.csv!")
     file.close()
@@ -98,8 +99,8 @@ def compareEncodings(arrayOfEncodings,newEncoding):
 # main function (tested and works!)
 def main():
     knownPeople = [] # arrays of encodings of each person and time of first encoding
-    entrance_video = "in4.mp4"
-    exit_video = "out4.mp4"
+    entrance_video = "in4.mp4" # change this
+    exit_video = "out4.mp4" # and this
     knownPeople = findFacesInVideo(entrance_video, True, knownPeople)
     knownPeople = findFacesInVideo(exit_video, False, knownPeople)
 
