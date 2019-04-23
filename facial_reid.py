@@ -4,11 +4,12 @@ import sys,os
 
 # find faces in a video
 def findFacesInVideo(nameOfVideo, known, knownPeople):
-    file = open("data.csv","a")
     video_capture = cv2.VideoCapture(nameOfVideo)
     if known:
         print("processing entrance video...")
     else:
+        file = open("data.csv","w")
+        file.write("entry time"+','+"time until re-identification\n")
         print("processing exit video...")
     frames = []
     frame_count = 0
@@ -79,11 +80,11 @@ def findFacesInVideo(nameOfVideo, known, knownPeople):
                 break
     if not known:
         print("data appended to data.csv!")
+        file.close()
     try:
         os.remove("croppedImage.jpg") # removes croppedImage.jpg after usage
     except:
         pass
-    file.close()
     return knownPeople
 
 # convert colours to allow opencv/face_recognition to process the image
