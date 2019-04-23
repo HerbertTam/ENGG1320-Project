@@ -102,8 +102,8 @@ def compareEncodings(arrayOfEncodings,newEncoding):
 # main function (tested and works!)
 def main():
     knownPeople = [] # arrays of encodings of each person and time of first encoding
-    entrance_video = "Faces+from+around+the+world.mp4" # change this
-    exit_video = "Faces+from+around+the+world.mp4" # and this
+    entrance_video = "accuracy_test.mp4" # change this
+    exit_video = "accuracy_test.mp4" # and this
     n = 15 # analyze video every n frames (1 is slowest, but most accurate)
     knownPeople = findFacesInVideo(entrance_video, True, knownPeople, n)
     knownPeople = findFacesInVideo(exit_video, False, knownPeople, n)
