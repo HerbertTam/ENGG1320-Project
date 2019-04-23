@@ -39,7 +39,7 @@ def findFacesInVideo(nameOfVideo, known, knownPeople):
                     image = face_recognition.load_image_file('croppedImage.jpg')
                     encoding = face_recognition.face_encodings(image, num_jitters=100)[0]
                 except:
-                    print("image not encodable (probably not a face)")
+                    print("image not encodable (probably not a person)")
                     continue
                 print("image encodable! ", end='')
                 for knownPerson in knownPeople:
@@ -58,7 +58,7 @@ def findFacesInVideo(nameOfVideo, known, knownPeople):
                     image = face_recognition.load_image_file('croppedImage.jpg')
                     encoding = face_recognition.face_encodings(image, num_jitters=100)[0]
                 except:
-                    print("image not encodable (probably not a face)")
+                    print("image not encodable (probably not a person)")
                     continue
                 print("image encodable! ", end='')
                 for knownPerson in knownPeople:
