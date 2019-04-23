@@ -3,7 +3,7 @@ import cv2
 import sys,os
 
 # find faces in a video
-def findFacesInVideo(nameOfVideo, known, knownPeople):
+def findFacesInVideo(nameOfVideo, known, knownPeople, n):
     video_capture = cv2.VideoCapture(nameOfVideo)
     if known:
         print("processing entrance video...")
@@ -23,61 +23,62 @@ def findFacesInVideo(nameOfVideo, known, knownPeople):
         # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
         frame = convertColours(frame)
         frame_count += 1
-        face_locations = face_recognition.face_locations(frame, number_of_times_to_upsample=0)
-        number_of_faces_in_frame = len(face_locations)
-        # print("I found {} face(s) in frame #{}.".format(number_of_faces_in_frame, frame_count))
-        count = 1
-        for face_location in face_locations:
-            # Print the location of each face in this frame
-            top, right, bottom, left = face_location
-            time = frame_count/fps
-            croppedImage = cropImage(convertColours(frame),top, left, bottom, right)
-            cv2.imwrite('croppedImage.jpg', croppedImage)
-            print("found a face at pixel location Top: {}, Left: {}, Bottom: {}, Right: {} at time {}".format(top, left, bottom, right, round(time,2)))
-            if known:
-                try:
-                    image = face_recognition.load_image_file('croppedImage.jpg')
-                    encoding = face_recognition.face_encodings(image, num_jitters=100)[0]
-                except:
-                    print("image not encodable (probably not a person)")
-                    continue
-                print("image encodable! ", end='')
-                for knownPerson in knownPeople:
-                    result = compareEncodings(knownPerson[0],encoding)[0]
-                    if result:
-                        print("person known! ", end='')
-                        knownPerson[0].append(encoding) # adds the encoding into the array of known encodings
-                        break
-                    else:
+        if frame_count % n == 0:
+            face_locations = face_recognition.face_locations(frame, number_of_times_to_upsample=0)
+            number_of_faces_in_frame = len(face_locations)
+            # print("I found {} face(s) in frame #{}.".format(number_of_faces_in_frame, frame_count))
+            count = 1
+            for face_location in face_locations:
+                # Print the location of each face in this frame
+                top, right, bottom, left = face_location
+                time = frame_count/fps
+                croppedImage = cropImage(convertColours(frame),top, left, bottom, right)
+                cv2.imwrite('croppedImage.jpg', croppedImage)
+                print("found a face at pixel location Top: {}, Left: {}, Bottom: {}, Right: {} at time {}".format(top, left, bottom, right, round(time,2)))
+                if known:
+                    try:
+                        image = face_recognition.load_image_file('croppedImage.jpg')
+                        encoding = face_recognition.face_encodings(image)[0]
+                    except:
+                        print("image not encodable (probably not a person)")
                         continue
+                    print("image encodable! ", end='')
+                    for knownPerson in knownPeople:
+                        result = compareEncodings(knownPerson[0],encoding)[0] # add num_jitters=100 as parameter to get maximum accuracy
+                        if result:
+                            print("person known! ", end='')
+                            knownPerson[0].append(encoding) # adds the encoding into the array of known encodings
+                            break
+                        else:
+                            continue
+                    else:
+                        print("person not known!\nadding person to known people. ", end='')
+                        knownPeople.append([[encoding],time]) # adds the first encoding in an array and time of first encoding to knownPeople
                 else:
-                    print("person not known!\nadding person to known people. ", end='')
-                    knownPeople.append([[encoding],time]) # adds the first encoding in an array and time of first encoding to knownPeople
-            else:
-                try:
-                    image = face_recognition.load_image_file('croppedImage.jpg')
-                    encoding = face_recognition.face_encodings(image, num_jitters=100)[0]
-                except:
-                    print("image not encodable (probably not a person)")
-                    continue
-                print("image encodable! ", end='')
-                for knownPerson in knownPeople:
-                    if compareEncodings(knownPerson[0],encoding)[0]:
-                        print("person known! updating data.txt and removing person from known people. ", end='')
-                        # append the the time of first encoding and difference in time between the time of first encoding and time of reidentification 
-                        # in the exit video into data.txt
-                        file.write(str(knownPerson[1]) + "," + str(time-knownPerson[1]))
-                        file.write("\n")
-                        knownPeople.remove(knownPerson)
-                        break
-                else:
-                    print("person not known! ", end='')
-            count += 1
-            print("number of known people =",len(knownPeople))
-        if not known:
-            if len(knownPeople) == 0:
-                print("there are no more known people to be reidentified.")
-                break
+                    try:
+                        image = face_recognition.load_image_file('croppedImage.jpg')
+                        encoding = face_recognition.face_encodings(image)[0] # add num_jitters=100 as parameter to get maximum accuracy
+                    except:
+                        print("image not encodable (probably not a person)")
+                        continue
+                    print("image encodable! ", end='')
+                    for knownPerson in knownPeople:
+                        if compareEncodings(knownPerson[0],encoding)[0]:
+                            print("person known! updating data.txt and removing person from known people. ", end='')
+                            # append the the time of first encoding and difference in time between the time of first encoding and time of reidentification 
+                            # in the exit video into data.txt
+                            file.write(str(knownPerson[1]) + "," + str(time-knownPerson[1]))
+                            file.write("\n")
+                            knownPeople.remove(knownPerson)
+                            break
+                    else:
+                        print("person not known! ", end='')
+                count += 1
+                print("number of known people =",len(knownPeople))
+            if not known:
+                if len(knownPeople) == 0:
+                    print("there are no more known people to be reidentified.")
+                    break
     if not known:
         print("data written to data.csv!")
         file.close()
@@ -101,9 +102,10 @@ def compareEncodings(arrayOfEncodings,newEncoding):
 # main function (tested and works!)
 def main():
     knownPeople = [] # arrays of encodings of each person and time of first encoding
-    entrance_video = "in3.mp4" # change this
-    exit_video = "out3.mp4" # and this
-    knownPeople = findFacesInVideo(entrance_video, True, knownPeople)
-    knownPeople = findFacesInVideo(exit_video, False, knownPeople)
+    entrance_video = "in4.mp4" # change this
+    exit_video = "out4.mp4" # and this
+    n = 15 # analyze video every n frames (1 is slowest, but most accurate)
+    knownPeople = findFacesInVideo(entrance_video, True, knownPeople, n)
+    knownPeople = findFacesInVideo(exit_video, False, knownPeople, n)
 
 main()
