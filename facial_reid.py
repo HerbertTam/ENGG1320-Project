@@ -79,7 +79,7 @@ def findFacesInVideo(nameOfVideo, known, knownPeople):
                 print("there are no more known people to be reidentified.")
                 break
     if not known:
-        print("data appended to data.csv!")
+        print("data written to data.csv!")
         file.close()
     try:
         os.remove("croppedImage.jpg") # removes croppedImage.jpg after usage
